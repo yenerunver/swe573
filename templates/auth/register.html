@@ -1,15 +1,11 @@
 {% extends 'base.html' %}
 
-{% block header %}
-  <h1>{% block title %}Register{% endblock %}</h1>
-{% endblock %}
+{% block title %}Register{% endblock %}
 
 {% block content %}
-  <form method="post">
-    <label for="username">Username</label>
-    <input name="username" id="username" required>
-    <label for="password">Password</label>
-    <input type="password" name="password" id="password" required>
-    <input type="submit" value="Register">
-  </form>
+        <div class="jumbotron">
+                <h1 class="text-center">Register</h1>
+                <p class="text-center">In order to use this tool, you should register with your Twitter account from below.</p>
+                <p class="text-center"><a class="btn btn-light" href="#">Register with Twitter</a></p>
+	</div>
 {% endblock %}
