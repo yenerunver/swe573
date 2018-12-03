@@ -1,6 +1,6 @@
-# swe573
-Tweet Originality Checker project repo for the course SWE 573 in Boğaziçi University for Fall 2018
+# Tweet Originality Checker
+Tweet Originality Checker is a python project aimed to detect stolen tweets in Twitter by searching automatically generated texts that are similar to the subjected tweet's content.
 
-Issues to be resolved, project tasks and project guidance as wiki entries are presented here.
+This project is designed for the course SWE 573 at Boğaziçi University in Fall 2018.
 
-The project address is: http://165.227.166.12:1573/
+The project address is: http://tweetoriginalitychecker.com
