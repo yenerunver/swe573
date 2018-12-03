@@ -1,10 +1,13 @@
 import os
 from flask import Flask, request, render_template
+import sqlite3
 import twitter
 
 app = Flask(__name__)
 
 app.config.from_object('config')
+
+conn = sqlite3.connect('database.db')
 
 api = twitter.Api(consumer_key=app.config['TWITTER_CONSUMER_KEY'],
         consumer_secret=app.config['TWITTER_CONSUMER_SECRET'],
@@ -22,7 +25,7 @@ def twitterdemo():
 
 @app.route('/test')
 def test():
-    return app.config['SECRET_KEY']
+    return "Opened database successfully";
 
 if __name__ == '__main__':
     app.run(debug=True)
