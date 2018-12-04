@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Analysis{% endblock %}
+
+{% block content %}
+	<div class="jumbotron">
+        <h1 class="text-center">Analysis of Tweet ID: {{ args.tw_tweet_id }}</h1>
+        <p><strong>Author:</strong> {{ args.tw_screen_name }}</p>
+        <p><strong>Text:</strong> {{ args.tw_tweet_text }}</p>
+    </div>
+	<div class="jumbotron">
+        <h1 class="text-center">Generated Texts</h1>
+    </div>
+{% endblock %}

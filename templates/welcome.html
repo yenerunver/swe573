@@ -4,10 +4,15 @@
 
 {% block content %}
 	<div class="jumbotron">
-    		<h1 class="text-center">Welcome to Tweet Originality Checker!</h1>
+        <h1 class="text-center">Welcome to Tweet Originality Checker!</h1>
 		<p>This tool is for checking a tweet's originalty. The response of this tool is labeled as either Original or Fake. Fake responses detailed with the origin of the base tweet.</p>
 		<p>Also, this tool has a scraper robot which seeks under the heights of tweet mountains and acts as a Twitter police by detecting fake tweets and replying to them with the original tweet.</p>
-    	</div>
+    {% if g.user %}
+        <p class="text-center"><a class="btn btn-success" href="{{ url_for('index') }}">Analyze a Tweet</a></p>
+    {% else %}
+        <p class="text-center"><a class="btn btn-primary" href="{{ url_for('twitter.login') }}">Login with Twitter</a></p>
+    {% endif %}
+    </div>
 {% endblock %}
 
 
