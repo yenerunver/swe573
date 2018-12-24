@@ -10,5 +10,10 @@
     </div>
 	<div class="jumbotron">
         <h1 class="text-center">Generated Texts</h1>
+        <ol>
+        {% for generated_text in generated_texts %}
+            <li>{{ generated_text }}</li>
+        {% endfor %}
+        </ol>
     </div>
 {% endblock %}

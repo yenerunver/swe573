@@ -94,6 +94,9 @@ def index():
 @login_required
 @globals
 def analysis():
+    from gensim.models import Doc2Vec
+    import pandas as pd
+
     data = request.form['url'].split('/')
 
     args = {
@@ -102,7 +105,19 @@ def analysis():
         "tw_tweet_text": str(api.GetStatus(int(data[2])).full_text)
     }
 
-    return render_template('analysis.html', args=args)
+    model = Doc2Vec.load('../trmodel.doc2vec')
+
+    suggestions = model.docvecs.most_similar(positive=[model.infer_vector(args['tw_tweet_text'].split(" "))], topn=5)
+
+    rows = [int(suggestion[0]) for suggestion in suggestions]
+
+    sentences = pd.read_csv('sentences.csv')
+
+    generated_sentences = [target_row.iloc[0]['sentence'].capitalize()+"."
+                           for target_row in [sentences.loc[sentences['id'] == index]
+                                              for index in rows]]
+
+    return render_template('analysis.html', args=args, generated_sentences=generated_sentences)
 
 if __name__ == '__main__':
     app.run(debug=True)

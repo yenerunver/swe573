@@ -1,4 +1,5 @@
 from gensim.models import Doc2Vec
+import pandas as pd
 
 model = Doc2Vec.load('trmodel.doc2vec')
 
@@ -6,9 +7,12 @@ new_sentence = "Dün okula gittim".split(" ")
 
 suggestions = model.docvecs.most_similar(positive=[model.infer_vector(new_sentence)], topn=5)
 
-print(suggestions)
+rows = [int(suggestion[0]) for suggestion in suggestions]
 
-'''
-for suggestion in suggestions:
-    print(model.docvecs[suggestion[0]])
-'''
+sentences = pd.read_csv('sentences.csv')
+
+generated_sentences = [target_row.iloc[0]['sentence'].capitalize()+"."
+                       for target_row in [sentences.loc[sentences['id'] == index]
+                                          for index in rows]]
+
+print(generated_sentences)
