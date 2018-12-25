@@ -99,6 +99,8 @@ def analysis():
 
     data = request.form['url'].split('/')
 
+    return str(api.GetStatus(int(data[2])))
+
     args = {
         "tw_screen_name": str(data[0]),
         "tw_tweet_id": int(data[2]),

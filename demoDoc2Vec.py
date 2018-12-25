@@ -3,7 +3,7 @@ import pandas as pd
 
 model = Doc2Vec.load('trmodel.doc2vec')
 
-new_sentence = "Dün okula gittim".split(" ")
+new_sentence = "Maaşlara zam geldi".split(" ")
 
 suggestions = model.docvecs.most_similar(positive=[model.infer_vector(new_sentence)], topn=5)
 
