@@ -3,17 +3,29 @@
 {% block title %}Analysis{% endblock %}
 
 {% block content %}
-	<div class="jumbotron">
-        <h1 class="text-center">Analysis of Tweet ID: {{ args.tw_tweet_id }}</h1>
-        <p><strong>Author:</strong> {{ args.tw_screen_name }}</p>
-        <p><strong>Text:</strong> {{ args.tw_tweet_text }}</p>
+    <h3 class="text-center">Analysis of Tweet ID: {{ tweet.tw_id }}</h3>
+	<div class="jumbotron row">
+        <div class="col-1">
+            <img src="{{ tweet.tw_user.profile_image_url }}" style="width: 100%; height: auto;" />
+        </div>
+        <div class="col-11">
+            <p><span class="text-primary float-left">{{ tweet.tw_user.screen_name }}</span><code class="float-right">{{ tweet.tw_created_at }}</code></p>
+            <div class="clearfix"></div>
+            <p>{{ tweet.tw_text }}</p>
+        </div>
+        <div class="clearfix"></div>
+    {%  if similar_tweet.tw_id %}
+        {{ similar_tweet.tw_text }}
+    {%  endif %}
     </div>
+    {% if generated_sentences %}
+    <h3 class="text-center">Generated Texts</h3>
 	<div class="jumbotron">
-        <h1 class="text-center">Generated Texts</h1>
         <ol>
-        {% for generated_text in generated_texts %}
-            <li>{{ generated_text }}</li>
+        {% for generated_sentence in generated_sentences %}
+            <li>{{ generated_sentence }}</li>
         {% endfor %}
         </ol>
     </div>
+    {% endif %}
 {% endblock %}

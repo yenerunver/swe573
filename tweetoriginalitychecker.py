@@ -3,7 +3,8 @@ from functools import wraps
 from flaskext.mysql import MySQL
 from datetime import datetime
 import twitter as twitter_api
-
+from twitter.error import TwitterError
+from generateDoc2VecText import generatesimilartext
 from flask_dance.contrib.twitter import make_twitter_blueprint, twitter
 
 app = Flask(__name__)
@@ -94,32 +95,48 @@ def index():
 @login_required
 @globals
 def analysis():
-    from gensim.models import Doc2Vec
-    import pandas as pd
-
     data = request.form['url'].split('/')
 
-    return str(api.GetStatus(int(data[2])))
+    try:
+        status = api.GetStatus(int(data[2]))
 
-    args = {
-        "tw_screen_name": str(data[0]),
-        "tw_tweet_id": int(data[2]),
-        "tw_tweet_text": str(api.GetStatus(int(data[2])).full_text)
+    except TwitterError as e:
+        flash("TwitterError :" + str(e.message))
+
+        return redirect(url_for("index"))
+
+    tweet = {
+        "tw_id": int(data[2]),
+        "tw_text": str(status.full_text),
+        "tw_created_at": datetime.strptime(status.created_at, "%a %b %d %H:%M:%S %z %Y").strftime('%Y-%m-%d %H:%M:%S'),
+        "tw_user": {
+            "name": status.user.name,
+            "screen_name": status.user.screen_name,
+            "profile_image_url": status.user.profile_image_url_https
+        }
     }
 
-    model = Doc2Vec.load('../trmodel.doc2vec')
+    if str(data[0]) != tweet['tw_user']['screen_name'] or str(data[1]) != 'status':
+        flash("Wrong tweet URL!")
 
-    suggestions = model.docvecs.most_similar(positive=[model.infer_vector(args['tw_tweet_text'].split(" "))], topn=5)
+        return redirect(url_for("index"))
 
-    rows = [int(suggestion[0]) for suggestion in suggestions]
+    try:
+        similar_tweet = api.GetSearch(raw_query=
+                                      "q="
+                                      + tweet['tw_text'].replace(" ", "%20").replace("'", "%27")
+                                      + "&until="
+                                      + datetime.strptime(tweet['tw_created_at'], "%Y-%m-%d %H:%M:%S")
+                                      .strftime('%Y-%m-%d')
+                                      + "&count=1&result_type=popular")
+    except TwitterError as e:
+        similar_tweet = {}
 
-    sentences = pd.read_csv('sentences.csv')
+        flash("TwitterError :" + str(e.message))
 
-    generated_sentences = [target_row.iloc[0]['sentence'].capitalize()+"."
-                           for target_row in [sentences.loc[sentences['id'] == index]
-                                              for index in rows]]
+    generated_sentences = generatesimilartext(tweet['tw_text'])
 
-    return render_template('analysis.html', args=args, generated_sentences=generated_sentences)
+    return render_template('analysis.html', tweet=tweet, similar_tweet=similar_tweet, generated_sentences=generated_sentences)
 
 if __name__ == '__main__':
     app.run(debug=True)
