@@ -13,19 +13,44 @@
             <div class="clearfix"></div>
             <p>{{ tweet.tw_text }}</p>
         </div>
-        <div class="clearfix"></div>
+     </div>
     {%  if similar_tweet.tw_id %}
-        {{ similar_tweet.tw_text }}
+    <h4 class="text-danger">Similar Tweet Found!</h4>
+	<div class="jumbotron row">
+        <div class="col-1">
+            <img src="{{ similar_tweet.tw_user.profile_image_url }}" style="width: 100%; height: auto;" />
+        </div>
+        <div class="col-11">
+            <p><span class="text-primary float-left">{{ similar_tweet.tw_user.screen_name }}</span><code class="float-right">{{ similar_tweet.tw_created_at }}</code></p>
+            <div class="clearfix"></div>
+            <p>{{ similar_tweet.tw_text }}</p>
+        </div>
+    </div>
     {%  endif %}
+    <p><small>(example result when similar tweet found)</small></p>
+    <h4 class="text-danger">Similar Tweet Found!</h4>
+    <div class="jumbotron row">
+        <div class="col-1">
+            <img src="https://via.placeholder.com/48" style="width: 100%; height: auto;" />
+        </div>
+        <div class="col-9">
+            <p><span class="text-primary float-left">Jane DOE</span><code class="float-right">2015-03-08 20:15:32</code></p>
+            <div class="clearfix"></div>
+            <p>{{ tweet.tw_text }}</p>
+        </div>
+        <div class="col-2">
+            <button class="btn btn-block btn-danger">REPORT!</button>
+        </div>
     </div>
     {% if generated_sentences %}
     <h3 class="text-center">Generated Texts</h3>
-	<div class="jumbotron">
-        <ol>
-        {% for generated_sentence in generated_sentences %}
-            <li>{{ generated_sentence }}</li>
-        {% endfor %}
-        </ol>
+    {% for generated_sentence in generated_sentences %}
+	<div class="jumbotron row">
+        <div class="col-10">{{ generated_sentence }}</div>
+        <div class="col-2">
+            <button class="btn btn-block btn-danger">ANALYZE!</button>
+        </div>
     </div>
+    {% endfor %}
     {% endif %}
 {% endblock %}
