@@ -4,6 +4,7 @@ from flaskext.mysql import MySQL
 from datetime import datetime
 import twitter as twitter_api
 from twitter.error import TwitterError
+#import tweepy
 from generateDoc2VecText import generatesimilartext
 from flask_dance.contrib.twitter import make_twitter_blueprint, twitter
 
@@ -26,6 +27,7 @@ api = twitter_api.Api(consumer_key=app.config['TWITTER_CONSUMER_KEY'],
         access_token_secret=app.config['TWITTER_ACCESS_TOKEN_SECRET'],
         tweet_mode='extended')
 
+
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -41,6 +43,7 @@ def globals(f):
 
         if twitter.authorized:
             tw_user = twitter.get("account/verify_credentials.json").json()
+
             cursor.execute('''SELECT COUNT(*) FROM users WHERE tw_id = %s''', (int(tw_user["id"])))
 
             if (str(cursor.fetchone()[0]) == '0'):
@@ -122,21 +125,40 @@ def analysis():
         return redirect(url_for("index"))
 
     try:
-        similar_tweet = api.GetSearch(raw_query=
-                                      "q="
-                                      + tweet['tw_text'].replace(" ", "%20").replace("'", "%27")
-                                      + "&until="
-                                      + datetime.strptime(tweet['tw_created_at'], "%Y-%m-%d %H:%M:%S")
-                                      .strftime('%Y-%m-%d')
-                                      + "&count=1&result_type=popular")
+        similar_tweet = api.GetSearch(term=tweet['tw_text'],
+                                      until=datetime.strptime(tweet['tw_created_at'], "%Y-%m-%d %H:%M:%S")
+                                      .strftime('%Y-%m-%d'),
+                                      count=1,
+                                      result_type="popular")
+
     except TwitterError as e:
-        similar_tweet = {}
+        similar_tweet = []
 
         flash("TwitterError :" + str(e.message))
 
     generated_sentences = generatesimilartext(tweet['tw_text'])
 
     return render_template('analysis.html', tweet=tweet, similar_tweet=similar_tweet, generated_sentences=generated_sentences)
+
+@app.route('/analysisbytext', methods=['POST'])
+@login_required
+@globals
+def analysisbytext():
+    text = request.form['text']
+
+    try:
+        similar_tweet = api.GetSearch(term=text,
+                                      count=1,
+                                      result_type="popular")
+
+    except TwitterError as e:
+        similar_tweet = []
+
+        flash("TwitterError :" + str(e.message))
+
+    generated_sentences = generatesimilartext(text)
+
+    return render_template('analysisbytext.html', text=text, similar_tweet=similar_tweet, generated_sentences=generated_sentences)
 
 if __name__ == '__main__':
     app.run(debug=True)

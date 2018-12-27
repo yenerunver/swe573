@@ -1,19 +1,9 @@
 {% extends 'base.html' %}
 
-{% block title %}Analysis{% endblock %}
+{% block title %}Analysis By Text{% endblock %}
 
 {% block content %}
-    <h3 class="text-center">Analysis of Tweet ID: {{ tweet.tw_id }}</h3>
-	<div class="jumbotron row">
-        <div class="col-1">
-            <img src="{{ tweet.tw_user.profile_image_url }}" style="width: 100%; height: auto;" />
-        </div>
-        <div class="col-11">
-            <p><span class="text-primary float-left">{{ tweet.tw_user.screen_name }}</span><code class="float-right">{{ tweet.tw_created_at }}</code></p>
-            <div class="clearfix"></div>
-            <p>{{ tweet.tw_text }}</p>
-        </div>
-     </div>
+    <h3 class="text-center">Analysis of Text: {{ text }}</h3>
     {%  if similar_tweet|length > 0 %}
     <h4 class="text-danger">Similar Tweet Found!</h4>
 	<div class="jumbotron row">
@@ -27,7 +17,7 @@
         </div>
         <div class="col-2">
             <a class="btn btn-block btn-danger twitter-share-button"
-  href="https://twitter.com/intent/tweet?in_reply_to={{ tweet.tw_id }}&text=This%20tweet%20is%20stolen!%20Here%20is%20the%20original%20one%3A%20https%3A%2F%2Ftwitter.com%2F{{ similar_tweet[0].user.screen_name }}%2Fstatus%2F{{ similar_tweet[0].id }}">REPORT!</a>
+  href="https://twitter.com/intent/tweet?text=This%20tweet%20is%20stolen!">REPORT!</a>
         </div>
     </div>
     {%  else %}
