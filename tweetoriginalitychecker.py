@@ -46,7 +46,7 @@ def globals(f):
 
             cursor.execute('''SELECT COUNT(*) FROM users WHERE tw_id = %s''', (int(tw_user["id"])))
 
-            if (str(cursor.fetchone()[0]) == '0'):
+            if str(cursor.fetchone()[0]) == '0':
                 cursor.execute(
                     """INSERT INTO users (tw_id, tw_name, tw_screen_name, tw_image, tw_location, tw_created_at)
                     VALUES (%s,%s,%s,%s, %s, %s)""",
@@ -108,14 +108,23 @@ def analysis():
 
         return redirect(url_for("index"))
 
+    if status.media is not None:
+        full_text = str(status.full_text).replace(" " + status.media[0].url, "")
+
+    else:
+        full_text = str(status.full_text)
+
     tweet = {
         "tw_id": int(data[2]),
-        "tw_text": str(status.full_text),
+        "tw_text": full_text,
         "tw_created_at": datetime.strptime(status.created_at, "%a %b %d %H:%M:%S %z %Y").strftime('%Y-%m-%d %H:%M:%S'),
         "tw_user": {
+            "id": status.user.id,
             "name": status.user.name,
             "screen_name": status.user.screen_name,
-            "profile_image_url": status.user.profile_image_url_https
+            "profile_image_url": status.user.profile_image_url_https,
+            "location": status.user.location,
+            "created_at": datetime.strptime(status.user.created_at, "%a %b %d %H:%M:%S %z %Y").strftime('%Y-%m-%d %H:%M:%S')
         }
     }
 
@@ -124,12 +133,47 @@ def analysis():
 
         return redirect(url_for("index"))
 
+    cursor = mysql.get_db().cursor()
+
+    cursor.execute('''SELECT COUNT(*) FROM tw_users WHERE tw_id = %s''', (int(tweet["tw_user"]["id"])))
+
+    if str(cursor.fetchone()[0]) == '0':
+        cursor.execute(
+            """INSERT INTO tw_users (tw_id, tw_name, tw_screen_name, tw_image, tw_location, tw_created_at)
+            VALUES (%s,%s,%s,%s, %s, %s)""",
+            (int(tweet["tw_user"]["id"]),
+             tweet["tw_user"]["name"],
+             tweet["tw_user"]["screen_name"],
+             tweet["tw_user"]["profile_image_url"],
+             tweet["tw_user"]["location"],
+             tweet["tw_user"]["created_at"]))
+
+        mysql.get_db().commit()
+
+    cursor.execute('''SELECT COUNT(*) FROM tweets WHERE tw_id = %s''', (int(tweet["tw_id"])))
+
+    if str(cursor.fetchone()[0]) == '0':
+        cursor.execute(
+            """INSERT INTO tweets (tw_id, tw_text, tw_user_id, tw_created_at)
+            VALUES (%s,%s,%s,%s)""",
+            (int(tweet["tw_id"]),
+             tweet["tw_text"],
+             tweet["tw_user"]["id"],
+             tweet["tw_created_at"]))
+
+        mysql.get_db().commit()
+
+    if len(tweet["tw_text"].split()) < 3:
+        flash("Please enter statuses that contain more than 3 words!")
+
+        return redirect(url_for("index"))
+
     try:
         similar_tweet = api.GetSearch(term=tweet['tw_text'],
                                       until=datetime.strptime(tweet['tw_created_at'], "%Y-%m-%d %H:%M:%S")
                                       .strftime('%Y-%m-%d'),
                                       count=1,
-                                      result_type="popular")
+                                      result_type="mixed")
 
     except TwitterError as e:
         similar_tweet = []
@@ -146,10 +190,15 @@ def analysis():
 def analysisbytext():
     text = request.form['text']
 
+    if len(text.split()) < 3:
+        flash("Please enter text that contain more than 3 words!")
+
+        return redirect(url_for("index"))
+
     try:
         similar_tweet = api.GetSearch(term=text,
                                       count=1,
-                                      result_type="popular")
+                                      result_type="mixed")
 
     except TwitterError as e:
         similar_tweet = []
