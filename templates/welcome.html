@@ -13,6 +13,19 @@
         <p class="text-center"><a class="btn btn-primary" href="{{ url_for('twitter.login') }}">Login with Twitter</a></p>
     {% endif %}
     </div>
+    <h1 class="text-center">Latest Searches</h1>
+    {% for tweet in tweets %}
+	<div class="jumbotron row">
+        <div class="col-1">
+            <img src="{{ tweet[6] }}" style="width: 100%; height: auto;" />
+        </div>
+        <div class="col-11">
+            <p><span class="text-primary float-left">{{ tweet[5] }}</span><code class="float-right">{{ tweet[3] }}</code></p>
+            <div class="clearfix"></div>
+            <p>{{ tweet[2] }}</p>
+        </div>
+     </div>
+    {% endfor %}
 {% endblock %}
 
 

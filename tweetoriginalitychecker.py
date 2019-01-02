@@ -78,7 +78,13 @@ def globals(f):
 @app.route('/')
 @globals
 def welcome():
-    return render_template("welcome.html")
+    cursor = mysql.get_db().cursor()
+
+    cursor.execute('''SELECT a.tw_id AS tweet_id, a.tw_user_id, a.tw_text, a.created_at AS search_created_at, b.tw_name, b.tw_screen_name, b.tw_image FROM tweets AS a LEFT JOIN tw_users AS b ON a.tw_user_id = b.tw_id ORDER BY a.created_at DESC LIMIT 5''')
+
+    tweets = cursor.fetchall()
+
+    return render_template("welcome.html", tweets=tweets)
 
 @app.route('/logout')
 def logout():
