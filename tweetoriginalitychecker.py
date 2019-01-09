@@ -122,7 +122,7 @@ def analysis():
 
     tweet = {
         "tw_id": int(data[2]),
-        "tw_text": full_text,
+        "tw_text": str(full_text.encode('unicode-escape')),
         "tw_created_at": datetime.strptime(status.created_at, "%a %b %d %H:%M:%S %z %Y").strftime('%Y-%m-%d %H:%M:%S'),
         "tw_user": {
             "id": status.user.id,
