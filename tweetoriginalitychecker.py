@@ -122,7 +122,7 @@ def analysis():
 
     tweet = {
         "tw_id": int(data[2]),
-        "tw_text": str(full_text.encode('unicode-escape')),
+        "tw_text": full_text,
         "tw_created_at": datetime.strptime(status.created_at, "%a %b %d %H:%M:%S %z %Y").strftime('%Y-%m-%d %H:%M:%S'),
         "tw_user": {
             "id": status.user.id,
@@ -163,7 +163,7 @@ def analysis():
             """INSERT INTO tweets (tw_id, tw_text, tw_user_id, tw_created_at)
             VALUES (%s,%s,%s,%s)""",
             (int(tweet["tw_id"]),
-             tweet["tw_text"],
+             str(tweet["tw_text"].encode('unicode-escape')),
              tweet["tw_user"]["id"],
              tweet["tw_created_at"]))
 
